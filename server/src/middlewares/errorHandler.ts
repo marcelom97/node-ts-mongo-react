@@ -1,17 +1,46 @@
+import { ErrorResponse } from '../errors/errorResponse';
 import { Request, Response, NextFunction } from 'express';
-import { CustomError } from '../errors/customError';
 
 export const errorHandler = (
-  err: Error,
+  err: any,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  if (err instanceof CustomError) {
-    return res.status(err.statusCode).send({ errors: err.serializeErrors() });
+  let error = { ...err };
+
+  error.message = err.message;
+
+  // Log to console for dev
+  console.log(error.message);
+
+  // Mongoose bad ObjectId
+  if (err.name === 'CastError') {
+    const message = `Resource not found with id of ${err.value}`;
+    error = new ErrorResponse(message, 404);
   }
 
-  res.status(400).json({
-    errors: [{ message: 'Something went wrong' }]
+  // Mongoose duplicate key
+  if (err.code === 11000) {
+    const message = 'Duplicate field value entered';
+    error = new ErrorResponse(message, 400);
+  }
+
+  // Mongoose validation error
+  /**
+   * If some fields in the model are required and
+   * you make and request with empty fields then it
+   * returns which fields are missing
+   */
+  if (err.name === 'ValidationError') {
+    const message: any = Object.values<any>(err.errors).map(val => {
+      return val.message.toString();
+    });
+    error = new ErrorResponse(message, 400);
+  }
+
+  res.status(error.statusCode || 500).json({
+    success: false,
+    error: error.message || 'Server Error'
   });
 };
