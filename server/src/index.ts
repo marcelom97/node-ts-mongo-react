@@ -1,15 +1,33 @@
 import express from 'express';
+import { json } from 'body-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { connectDB } from './config/connectDB';
+import { connectDB } from './services/connectDB';
 
-dotenv.config({ path: './config/config.env' });
+import { errorHandler } from './middlewares/errorHandler';
 
+// Puth the asbolute path of the .env file
+dotenv.config({ path: './src/config/config.env' });
+
+// Import Routers
+import { userRouter } from './routes/userRouter';
+
+// Init Server
 const app = express();
+app.use(json());
+// Mount cors middleware
 app.use(cors());
+// Mount Logging middleware
 app.use(morgan('dev'));
 
+// Mount routers
+app.use('/api/v1/users', userRouter);
+
+// Error Handler
+app.use(errorHandler);
+
+// Connect to Database
 connectDB();
 
 const PORT = process.env.PORT || 5000;

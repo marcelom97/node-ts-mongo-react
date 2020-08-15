@@ -11,6 +11,6 @@ export const connectDB = async () => {
     });
     console.log(`MongoDB connected to -> ${host}:${port}/${database}`);
   } catch (err) {
-    console.error(`Couldn't connect to MongoDB`);
+    console.error(`Couldn't connect to -> ${host}:${port}/${database}`);
   }
 };
