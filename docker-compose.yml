@@ -20,7 +20,7 @@ services:
     image: mongo
     working_dir: /data
     ports:
-      - '27017:27017'
+      - '2717:27017'
     volumes:
       - mongodata:/data/db
 volumes:

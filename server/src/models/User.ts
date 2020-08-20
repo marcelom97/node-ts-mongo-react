@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-
+import jwt, { Secret } from 'jsonwebtoken';
 import { PasswordManager } from '../services/passwordManager';
 
 const userSchema = new mongoose.Schema({
@@ -56,6 +56,15 @@ interface UserDoc extends mongoose.Document {
 // because typecript and mongoose don't cooperate
 userSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs);
+};
+
+// Sign JWT and return
+userSchema.methods.getSignedJwtToken = function () {
+  const JWT_SECRET = process.env.JWT_SECRET as Secret;
+  const JWT_EXPIRE = process.env.JWT_EXPIRE;
+  return jwt.sign({ id: this._id }, JWT_SECRET, {
+    expiresIn: JWT_EXPIRE
+  });
 };
 
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);

@@ -12,6 +12,7 @@ dotenv.config({ path: './src/config/config.env' });
 
 // Import Routers
 import { userRouter } from './routes/userRouter';
+import { authRouter } from './routes/authRouter';
 
 // Init Server
 const app = express();
@@ -23,6 +24,7 @@ app.use(morgan('dev'));
 
 // Mount routers
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/auth', authRouter);
 
 // Error Handler
 app.use(errorHandler);
