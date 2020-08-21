@@ -1,5 +1,6 @@
 import express from 'express';
 import { json } from 'body-parser';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
@@ -21,6 +22,13 @@ app.use(json());
 app.use(cors());
 // Mount Logging middleware
 app.use(morgan('dev'));
+
+// Mount Cookie Parser
+app.use(cookieParser());
+
+// Needed to be able to read body data
+app.use(express.json()); // to support JSON-encoded bodies
+app.use(express.urlencoded({ extended: true })); // support URL-encoded bodies
 
 // Mount routers
 app.use('/api/v1/users', userRouter);
