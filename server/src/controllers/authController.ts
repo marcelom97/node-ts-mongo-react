@@ -46,6 +46,8 @@ export const getCurrentUser = asyncHandler(
   }
 );
 
+export 
+
 const sendTokenResponse = (user: any, statusCode: number, res: any) => {
   const token = user.getSignedJwtToken();
 
