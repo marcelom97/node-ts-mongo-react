@@ -7,8 +7,6 @@ import {
   getSpecificUser
 } from '../controllers/userController';
 
-import { body } from 'express-validator';
-
 import { validateRequest } from '../middlewares/validateRequests';
 
 const router = express.Router();

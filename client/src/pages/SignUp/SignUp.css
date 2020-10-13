@@ -1,0 +1,54 @@
+.sign_up {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 30vw;
+}
+
+.sign_up > form {
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+}
+
+.sign_up > form > input {
+  border-radius: 30px;
+  padding: 10px;
+  border: none;
+  outline-width: 0; /* Does't display outline box */
+  margin-top: 10px;
+}
+
+.sign_up > form > div {
+  font-size: 13px;
+  color: lightslategrey;
+}
+
+.sign_up > form > button {
+  border-radius: 30px;
+  padding: 10px;
+  border: none;
+  outline-width: 0; /* Does't display outline box */
+  margin-top: 10px;
+  background-color: white;
+  color: lightslategrey;
+}
+
+.signup_footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.signup_footer > a {
+  text-decoration: none; /* Removes the underline */
+  color: lightslategrey;
+}
+
+.signup_icon {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-bottom: 30px;
+}
