@@ -3,6 +3,12 @@ import { asyncHandler } from './asyncHandler';
 import { User } from '../models/User';
 import { ErrorResponse } from '../errors/errorResponse';
 
+interface Session {
+  id: string;
+  iat: number;
+  exp: number;
+}
+
 export const protect = asyncHandler(async (req, res, next) => {
   let token = null;
 
@@ -44,9 +50,3 @@ export const protect = asyncHandler(async (req, res, next) => {
     );
   }
 });
-
-interface Session {
-  id: string;
-  iat: number;
-  exp: number;
-}

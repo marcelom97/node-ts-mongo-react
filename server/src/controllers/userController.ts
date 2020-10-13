@@ -19,7 +19,7 @@ export const createUser = asyncHandler(
       return next(new BadRequestError("User can't be created"));
     }
 
-    await user!.save();
+    await user.save();
 
     res.status(201).json({
       success: true,

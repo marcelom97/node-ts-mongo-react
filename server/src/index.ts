@@ -4,8 +4,9 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import { connectDB } from './services/connectDB';
+import expressSession from 'express-session';
 
+import { connectDB } from './services/connectDB';
 import { errorHandler } from './middlewares/errorHandler';
 
 // Puth the asbolute path of the .env file
@@ -25,6 +26,21 @@ app.use(morgan('dev'));
 
 // Mount Cookie Parser
 app.use(cookieParser());
+
+// Mount Session Middleware
+const sess = {
+  name: 'session',
+  secret: 'dsafiujadsfkhsdfnkahfnasdnfl,.aikusjdhfb',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production'
+  }
+};
+
+app.set('trust proxy', 1); // trust first proxy
+
+app.use(expressSession(sess));
 
 // Needed to be able to read body data
 app.use(express.json()); // to support JSON-encoded bodies

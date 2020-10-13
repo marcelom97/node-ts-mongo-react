@@ -7,7 +7,8 @@ export const connectDB = async () => {
   try {
     await mongoose.connect(`${host}:${port}/${database}`, {
       useNewUrlParser: true,
-      useUnifiedTopology: false
+      useUnifiedTopology: true,
+      useCreateIndex: true
     });
     console.log(`MongoDB connected to -> ${host}:${port}/${database}`);
   } catch (err) {

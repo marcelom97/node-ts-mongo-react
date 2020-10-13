@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Please provide a password'],
-    select: false
+    select: false,
+    minlength: [6, 'The password must be at least 6 characters']
   }
 });
 
@@ -32,7 +33,7 @@ userSchema.pre('save', async function (done) {
 });
 
 // An interface that describes the properties
-// that aer erquired to create a new User
+// that are required to create a new User
 interface UserAttrs {
   username: string;
   email: string;
@@ -46,7 +47,7 @@ interface UserModel extends mongoose.Model<UserDoc> {
 }
 
 // An interface that describes the properties
-// that  User Document has
+// that User Document has
 interface UserDoc extends mongoose.Document {
   username: string;
   email: string;
