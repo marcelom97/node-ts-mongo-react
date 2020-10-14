@@ -1,36 +1,41 @@
 import { Request, Response, NextFunction } from 'express';
-import { User } from '../models/User';
+import { UserModel } from '../database/Users/users.model';
 
 import { BadRequestError } from '../errors/badRequestError';
 import { asyncHandler } from '../middlewares/asyncHandler';
 
 export const createUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { username, email, password } = req.body;
-    let user = await User.findOne({ email });
+    const { username, email, password, firstname, lastname } = req.body;
+    const user = await UserModel.findOne({ email });
 
     if (user) {
       return next(new BadRequestError('User already exists'));
     }
 
+    let newUser;
     try {
-      user = User.build({ username, email, password });
+      newUser = await UserModel.create({
+        username,
+        email,
+        password,
+        firstname,
+        lastname
+      });
     } catch (err) {
       return next(new BadRequestError("User can't be created"));
     }
 
-    await user.save();
-
     res.status(201).json({
       success: true,
-      data: user
+      data: newUser
     });
   }
 );
 
 export const getAllUsers = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const users = await User.find();
+    const users = await UserModel.find();
 
     res.status(200).json({
       success: true,
@@ -42,7 +47,7 @@ export const getAllUsers = asyncHandler(
 
 export const getSpecificUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = await User.findById(req.params.id);
+    const user = await UserModel.findById(req.params.id);
 
     if (!user) {
       return next(new BadRequestError('User not exists'));
@@ -57,7 +62,7 @@ export const getSpecificUser = asyncHandler(
 
 export const deleteUserById = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const user = await UserModel.findByIdAndDelete(req.params.id);
 
     if (!user) {
       return next(new BadRequestError('User not exists'));

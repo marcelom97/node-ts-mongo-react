@@ -1,9 +1,10 @@
-import { User } from '../models/User';
+import { UserModel } from '../database/Users/users.model';
 import { Request, Response, NextFunction } from 'express';
 import { BadRequestError } from '../errors/badRequestError';
 import { PasswordManager } from '../services/passwordManager';
 import { ErrorResponse } from '../errors/errorResponse';
 import { asyncHandler } from '../middlewares/asyncHandler';
+import { sendEmail } from '../services/forgotPasswordConfirmationEmail';
 
 export const loginUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -16,7 +17,7 @@ export const loginUser = asyncHandler(
       );
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await UserModel.findOne({ email }).select('+password');
 
     if (!user) {
       return next(new BadRequestError('User not exists'));
@@ -35,9 +36,24 @@ export const loginUser = asyncHandler(
   }
 );
 
+export const registerNewUser = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { username, email, password, firstname, lastname } = req.body;
+    const user = await UserModel.create({
+      username,
+      email,
+      password,
+      firstname,
+      lastname
+    });
+
+    sendTokenResponse(user, 200, res);
+  }
+);
+
 export const getCurrentUser = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = await User.findById(req.user.id);
+    const user = await UserModel.findById(req.user.id);
 
     res.status(200).json({
       success: true,
@@ -46,10 +62,46 @@ export const getCurrentUser = asyncHandler(
   }
 );
 
-export 
+export const forgotPassword = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = await UserModel.findOne({ email: req.body.email });
 
-const sendTokenResponse = (user: any, statusCode: number, res: any) => {
-  const token = user.getSignedJwtToken();
+    if (!user) {
+      return next(new ErrorResponse('There is no user with that email', 404));
+    }
+
+    // Get reset token
+    const resetToken = user.getResetPasswordToken();
+
+    await user.save({ validateBeforeSave: false });
+
+    // Create reset url
+    const resetUrl = `http://localhost:3000/resetpassword/${resetToken}`;
+
+    const message = `You are receiving this email because you (or someone else) has requested the reset of a password. \nPlease follow the link to change your password: \n\n ${resetUrl}`;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Password reset token',
+        message
+      });
+
+      res.status(200).json({ success: true, data: 'Email sent', resetToken });
+    } catch (err) {
+      console.log(err);
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+
+      await user.save({ validateBeforeSave: false });
+
+      return next(new ErrorResponse('Email could not be sent', 500));
+    }
+  }
+);
+
+const sendTokenResponse = async (user: any, statusCode: number, res: any) => {
+  const token = await user.getSignedJwtToken();
 
   const JWT_COOKIE_EXPIRE = parseInt(process.env.JWT_COOKIE_EXPIRE!);
   const options = {

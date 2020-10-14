@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import jwt, { Secret } from 'jsonwebtoken';
 import { PasswordManager } from '../services/passwordManager';
+import crypto from 'crypto';
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -21,6 +22,25 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Please provide a password'],
     select: false,
     minlength: [6, 'The password must be at least 6 characters']
+  },
+  firstname: {
+    type: String,
+    required: [true, 'Please provide a valid first name']
+  },
+  lastname: {
+    type: String,
+    required: [true, 'Please provide a valid last name']
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  },
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
+  createdAt: {
+    type: Date,
+    default: Date.now()
   }
 });
 
@@ -38,6 +58,12 @@ interface UserAttrs {
   username: string;
   email: string;
   password: string;
+  firstname: string;
+  lastname: string;
+  role: string;
+  resetPasswordToken: string;
+  resetPasswordExpire: string;
+  createdAt: string;
 }
 
 // An interface that describes the properties
@@ -52,12 +78,35 @@ interface UserDoc extends mongoose.Document {
   username: string;
   email: string;
   password: string;
+  firstname: string;
+  lastname: string;
+  role?: string;
+  resetPasswordToken?: string | undefined;
+  resetPasswordExpire?: string | undefined;
+  createdAt?: string | undefined;
 }
 
 // Function to create a new User
 // because typecript and mongoose don't cooperate
 userSchema.statics.build = (attrs: UserAttrs) => {
   return new User(attrs);
+};
+
+// Generate and hash password token
+userSchema.methods.getResetPasswordToken = function () {
+  // Generate token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash token and set to resetPasswordToken field
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Set Expire
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 100;
+
+  return resetToken;
 };
 
 // Sign JWT and return
@@ -72,3 +121,5 @@ userSchema.methods.getSignedJwtToken = function () {
 const User = mongoose.model<UserDoc, UserModel>('User', userSchema);
 
 export { User };
+
+// TODO: Remove this old model version
