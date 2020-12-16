@@ -10,7 +10,7 @@ import { connectDB } from './services/connectDB';
 import { errorHandler } from './middlewares/errorHandler';
 
 // Puth the asbolute path of the .env file
-dotenv.config({ path: './src/config/config.env' });
+dotenv.config({ path: './src/config/config.env.local' });
 
 // Import Routers
 import { userRouter } from './routes/userRouter';
@@ -25,7 +25,7 @@ app.use(
   cors({
     origin: 'http://localhost:3000',
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-    credentials: true
+    credentials: true,
   })
 );
 // Mount Logging middleware
@@ -41,8 +41,8 @@ const sess = {
   resave: false,
   saveUninitialized: true,
   cookie: {
-    secure: process.env.NODE_ENV === 'production'
-  }
+    secure: process.env.NODE_ENV === 'production',
+  },
 };
 
 app.set('trust proxy', 1); // trust first proxy
