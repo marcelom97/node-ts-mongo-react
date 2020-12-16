@@ -5,39 +5,36 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 
 import axios from '../../axios';
 
-import './ForgotPassword.css';
+import './ResetPasswordPage.css';
 
-export default function ForgotPassword() {
-  async function handleSubmit({ email }) {
-    // e.preventDefault();
+function ResetPasswordPage() {
+  async function handleSubmit({ password }) {
+    const url = window.location.href.split('/');
+    const token = url[url.length - 1];
     try {
-      const res = await axios.post('/api/v1/auth/forgotpassword', {
-        email
+      const res = axios.put(`/api/v1/auth/resetpassword/${token}`, {
+        password
       });
       console.log(res.data);
     } catch (error) {
       console.log(error.response);
     }
   }
-
   return (
-    <div className='forgot_password'>
-      <div className='forgot_password_icon'>
+    <div className='reset_password'>
+      <div className='reset_password_icon'>
         <VpnKeyOutlinedIcon fontSize='large' />
       </div>
       <Formik
-        initialValues={{ email: '' }}
+        initialValues={{ password: '' }}
         validate={values => {
           const errors = {};
 
-          if (!values.email) {
-            errors.email = 'Required';
-          } else if (
-            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-          ) {
-            errors.email = 'Invalid email address';
+          if (!values.password) {
+            errors.password = 'Required';
+          } else if (values.password.length < 6) {
+            errors.password = 'Password length must me greater than 6!';
           }
-
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
@@ -49,15 +46,15 @@ export default function ForgotPassword() {
       >
         {({ isSubmitting }) => (
           <Form>
-            <Field type='email' name='email' placeholder='Email' />
-            <ErrorMessage name='email' component='div' />
+            <Field type='password' name='password' placeholder='Password' />
+            <ErrorMessage name='password' component='div' />
 
-            <Button type='submit' disabled={isSubmitting}>
-              Send Confirmation
-            </Button>
+            <Button type='submit'>Reset Password</Button>
           </Form>
         )}
       </Formik>
     </div>
   );
 }
+
+export default ResetPasswordPage;

@@ -1,12 +1,26 @@
 import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { Button } from '@material-ui/core';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import axios from '../../axios';
 
-import './SignIn.css';
+import './SignInPage.css';
 
-function SignIn() {
+function SignInPage() {
+  const history = useHistory();
+
+  async function signIn(values) {
+    try {
+      const res = await axios.post('/api/v1/auth/login', { ...values });
+      if (res.data.success) {
+        history.push('/chat');
+      }
+    } catch (error) {
+      console.log(error.response);
+    }
+  }
+
   return (
     <div className='signin_form'>
       <div className='signin_icon'>
@@ -25,15 +39,11 @@ function SignIn() {
             errors.email = 'Invalid email address';
           }
 
-          if (!values.password) {
-            errors.password = 'Required';
-          }
-
           return errors;
         }}
         onSubmit={(values, { setSubmitting }) => {
           setTimeout(() => {
-            // signIn(values);
+            signIn(values);
             setSubmitting(false);
           }, 400);
         }}
@@ -60,4 +70,4 @@ function SignIn() {
   );
 }
 
-export default SignIn;
+export default SignInPage;

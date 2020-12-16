@@ -1,35 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@material-ui/core';
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import useDebounce from '../../hooks/useDebounce';
 
 import axios from '../../axios';
 
-import './SignUp.css';
+import './SignUpPage.css';
 
-// API search function
-async function searchEmail(email) {
-  if (email.length !== 0 && email !== ' ') {
-    const res = await axios.get(
-      `/api/v1/service/checkemail/${email.toLowerCase()}`
-    );
-    return res.data.count === 0 ? true : false;
-  }
-  return true;
-}
+export default function SignUpPage() {
+  const history = useHistory();
 
-async function searchUsername(username) {
-  if (username.length !== 0 && username !== ' ') {
-    const res = await axios.get(
-      `/api/v1/service/checkusername/${username.toLowerCase()}`
-    );
-    return res.data.count === 0 ? true : false;
-  }
-  return true;
-}
-
-function SignUp() {
   const [username, setUsername] = useState(' ');
   const [email, setEmail] = useState(' ');
   const [password, setPassword] = useState(' ');
@@ -73,16 +54,10 @@ function SignUp() {
         lastname
       });
       console.log(res.data);
+      history.push('/chat');
     } catch (error) {
       console.log(error.response);
     }
-    console.log({
-      username,
-      email,
-      password,
-      firstname,
-      lastname
-    });
   }
 
   return (
@@ -148,4 +123,23 @@ function SignUp() {
   );
 }
 
-export default SignUp;
+// API search function
+async function searchEmail(email) {
+  if (email.length !== 0 && email !== ' ') {
+    const res = await axios.get(
+      `/api/v1/service/checkemail/${email.toLowerCase()}`
+    );
+    return res.data.count === 0 ? true : false;
+  }
+  return true;
+}
+
+async function searchUsername(username) {
+  if (username.length !== 0 && username !== ' ') {
+    const res = await axios.get(
+      `/api/v1/service/checkusername/${username.toLowerCase()}`
+    );
+    return res.data.count === 0 ? true : false;
+  }
+  return true;
+}
