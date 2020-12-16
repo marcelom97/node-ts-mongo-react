@@ -8,12 +8,13 @@ services:
       - '5000:5000'
     links:
       - mongo
-  # client:
-  #   container_name: client
-  #   restart: always
-  #   build: ./client
-  #   ports:
-  #     - '3000:3000'
+  client:
+    tty: true
+    container_name: client
+    restart: on-failure
+    build: ./client
+    ports:
+      - '3000:3000'
   mongo:
     container_name: mongo
     restart: always
